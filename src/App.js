@@ -1,8 +1,6 @@
-import AddStra from "./AddStra";
 import Dashboard  from "./Dashboard";
-import React from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import MenuIcon from '@material-ui/icons/Menu';
+import React , {useEffect} from "react";
 import clsx from 'clsx';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -10,17 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Badge from '@material-ui/core/Badge';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import Drawer from '@material-ui/core/Drawer';
-import Divider from '@material-ui/core/Divider';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import AssignmentIcon from '@material-ui/icons/Assignment';
-import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
+import Cookies from 'universal-cookie';
 
 
 import {
@@ -29,10 +17,11 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import { dialogContentTextClasses } from "@mui/material";
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ({  
   root: {
     display: 'flex',
   },
@@ -121,37 +110,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
+
 export default function App() {
 
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-
+ 
+  const set_cookies = () => {
+    const cookies = new Cookies();
+    cookies.set('myCat', 'Pacman', {path: '/' });
+    // cookies.get('myCat');
+  };
 
   return (
     <Router>
     <div className={classes.root}>
       <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
         <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
-            size="large">
-            <MenuIcon />
-          </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             Dashboard
           </Typography>
-          <IconButton color="inherit" size="large">
+          <IconButton color="inherit" size="small">
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
             </Badge>
@@ -159,75 +146,7 @@ export default function App() {
         </Toolbar>
       </AppBar>
 
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose} size="large">
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        <List>
-
-        <div>
-          <ListItem button component={Link} to='/dashboard'>
-            <ListItemIcon>
-              <DashboardIcon />
-            </ListItemIcon>
-
-            <ListItemText  primary="Dashboard" />
-          </ListItem>
-          <ListItem button component={Link} to='/addStra'>
-            <ListItemIcon>
-              <SettingsApplicationsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Add Strategy" />
-          </ListItem>
-        </div>
-
-        </List>
-        <Divider />
-        <List>
-
-        <div> 
-          <ListSubheader inset>Saved reports</ListSubheader> 
-          <ListItem button> 
-            <ListItemIcon>
-              <AssignmentIcon /> 
-            </ListItemIcon>
-            <ListItemText primary="Current month" /> 
-          </ListItem> 
-
-          <ListItem button>
-            <ListItemIcon>
-              <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Last Day" /> 
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon> 
-              <AssignmentIcon />  
-            </ListItemIcon> 
-            <ListItemText primary="Last quarter" /> 
-          </ListItem> 
-        </div> 
-        </List>
-        
-      </Drawer>
-
-        <Switch>
-          <Route path="/dashboard">
-            {Dashboard(classes)}
-          </Route>
-          <Route path="/addStra">
-            {AddStra(classes)}
-          </Route>
-        </Switch>
+        {Dashboard(classes)}
 
 
       </div>
