@@ -68,7 +68,7 @@ export default function Accounts(classes) {
           const myArray = addresses.split("|,|"); 
           let json = JSON.stringify(myArray);
           let post_data={json_data:json}
-          axios.post('http://wyvernbots.com/list_address/' ,post_data) 
+          axios.post('http://wyvernbots.com:8585/list_address/' ,post_data) 
             .then(res => {
               setRows(res.data);
             })
