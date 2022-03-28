@@ -1,34 +1,47 @@
-import React from 'react';
-import { useTheme } from '@material-ui/core/styles';
-import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
+import React ,{useEffect ,useState} from 'react';
+import { createTheme } from '@material-ui/core/styles';
+import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer ,Legend ,CartesianGrid ,Tooltip} from 'recharts';
 import Title from './Title';
+import axios from 'axios';
 
-// Generate Sales Data
-function createData(time, amount) {
-  return { time, amount };
-}
-
-const data = [
-  createData('00:00', 0),
-  createData('03:00', 30),
-  createData('06:00', 60),
-  createData('09:00', 80),
-  createData('12:00', 150),
-  createData('15:00', 200),
-  createData('18:00', 240),
-  createData('21:00', 240),
-  createData('24:00', undefined),
-];
 
 export default function Chart() {
-  const theme = useTheme();
+
+  const theme = createTheme({
+    palette: {
+      hero: {
+        main: '#49098E',
+      },
+      jewel: {
+        main: '#4E8E09',
+      },
+    },
+  });
+
+  const [price, setPrice] = useState([]);
+  const [lastJewel, setLastJewel] = useState(0);
+  const [lastHero, setLastHero] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+    axios.get('http://wyvernbots.com:8585/hero_jewel/price') 
+      .then(res => {
+        setPrice( res.data.map((x) => ({'jewel':x[0] ,'hero':x[1] ,'time': x[2]})) );
+        setLastJewel(res.data[res.data.length-1][0]);
+        setLastHero(res.data[res.data.length-1][1]);
+      })
+    }, 5000);
+  
+    return () => clearInterval(interval);
+  }, []);
+
 
   return (
     <React.Fragment>
-      <Title>Today</Title>
+      <Title><span style={{color : "primary"}} > Hero : {lastHero}</span>  |  <span style={{color : theme.palette.jewel.main}} > Jewel : {lastJewel}</span>  </Title>
       <ResponsiveContainer>
         <LineChart
-          data={data}
+          data={price}
           margin={{
             top: 16,
             right: 16,
@@ -36,19 +49,22 @@ export default function Chart() {
             left: 24,
           }}
         >
-          <XAxis dataKey="time" stroke={theme.palette.text.secondary} />
-          <YAxis stroke={theme.palette.text.secondary}>
-            <Label
-              angle={270}
-              position="left"
-              style={{ textAnchor: 'middle', fill: theme.palette.text.primary }}
-            >
-              Positions
-            </Label>
-          </YAxis>
-          <Line type="monotone" dataKey="amount" stroke={theme.palette.primary.main} dot={false} />
+          <XAxis dataKey="time" /> 
+          <YAxis yAxisId="left"> </YAxis>
+          <YAxis yAxisId="right" orientation="right" ></YAxis>
+          <Tooltip/>
+          <Legend />
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="hero"
+            color="primary"
+            activeDot={{ r: 4 }}
+          />
+          <Line yAxisId="right" type="monotone" dataKey="jewel" stroke={theme.palette.jewel.main} />
         </LineChart>
       </ResponsiveContainer>
     </React.Fragment>
   );
+
 }

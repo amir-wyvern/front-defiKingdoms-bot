@@ -139,7 +139,7 @@ export default function App() {
             Dashboard
           </Typography>
           <IconButton color="inherit" size="small">
-            <Badge badgeContent={4} color="secondary">
+            <Badge badgeContent={0} color="secondary">
               <NotificationsIcon />
             </Badge>
           </IconButton>

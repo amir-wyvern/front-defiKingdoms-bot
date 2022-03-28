@@ -1,6 +1,4 @@
 import React ,{useEffect ,useRef , useState} from 'react';
-import Link from '@material-ui/core/Link';
-import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -20,9 +18,6 @@ import AddCircleOutlineTwoToneIcon from '@mui/icons-material/AddCircleOutlineTwo
 
 const cookies = new Cookies();
 
-function preventDefault(event) {
-  event.preventDefault();
-}
 
 
 export default function Accounts(classes) {
@@ -30,7 +25,7 @@ export default function Accounts(classes) {
   const constructorCache = cookies.get('ListAddress')
   let lsAddr = []
   if (constructorCache) {
-    lsAddr = constructorCache.split("|,|").map((addr) => ({'name': 'None' ,'addr':addr ,'balance':'None' ,'hero':'None' ,'onSell': 'None'}) );
+    lsAddr = constructorCache.split("|,|").map((address) => ({'name': 'None' ,'address':address ,'balance':'None' ,'heroes':'None' ,'auction': 'None'}) );
     console.log(lsAddr);
   }
   const [rows, setRows] = useState(lsAddr);
@@ -83,7 +78,7 @@ export default function Accounts(classes) {
   const AddAddressToCache = () => {
     let result = Web3.utils.isAddress(valueRef.current.value);
     
-    const checkExist = rows.map((n) => n.addr == valueRef.current.value).some( (n) => n == true);
+    const checkExist = rows.map((n) => n.address == valueRef.current.value).some( (n) => n == true);
     if (result == true && checkExist){
       alert('This address already exists!');
       valueRef.current.value = '';
@@ -99,7 +94,7 @@ export default function Accounts(classes) {
       }
 
       const newRow = [...rows];  
-      newRow.push({'name' : 'None' ,'addr':valueRef.current.value ,'balance':'None' ,'hero':'None' ,'onSell':'None'}) ;
+      newRow.push({'name' : 'None' ,'address':valueRef.current.value ,'balance':'None' ,'heroes':'None' ,'auction':'None'}) ;
       setRows(newRow);
       cookies2.set('ListAddress',list_address , {path: '/' });
       valueRef.current.value = '';
@@ -117,10 +112,52 @@ export default function Accounts(classes) {
       <AddCircleOutlineTwoToneIcon fontSize="large" color="action" />
     </IconButton>
   )
+
+  function ifButton() {
+    
+    if (rows.length) {
+      return  <Button variant="contained" size="small" className="btn-delete" color="secondary" onClick={()=> delAllAccount() } >del all account</Button>;
+    }
+    return null;
+  }
+
   return (
     <React.Fragment>
       
       <Grid container item spacing={3}>
+      
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <Title>Review Accounts</Title>
+            
+            <Table size="small"> 
+            <TableHead > 
+                <TableRow >
+                  <TableCell>Name</TableCell>
+                  <TableCell>Address</TableCell>
+                  <TableCell>Balance</TableCell>
+                  <TableCell>In Quest</TableCell>
+                  <TableCell>At Auction</TableCell>
+                  <TableCell>Total Heroes</TableCell>
+                </TableRow>
+            </TableHead>
+
+            <TableBody>
+                {rows.map((row, index) => {
+                  return ( <TableRow >
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.address.slice(0,4) + '***' +row.address.slice(-4) }</TableCell>
+                    <TableCell>{row.balance}</TableCell>
+                    <TableCell> None </TableCell>
+                    <TableCell>{row.auction}</TableCell>
+                    <TableCell>{row.heroes}</TableCell>
+                    <Button variant="contained" size="small" className="btn-info" color="primary" >more</Button>
+                    <Button  variant="contained" size="small" className="btn-delete" color="secondary" onClick={()=> delAccount(index) }>del</Button>
+                  </TableRow>) })}
+              </TableBody> 
+            </Table>
+          </Paper>
+
         <Grid item xs={12}>
             <TextField
               variant="outlined"
@@ -135,45 +172,10 @@ export default function Accounts(classes) {
               InputProps={{startAdornment: <AddButton />}}
             />
         </Grid>
-      
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <Button variant="contained" size="small" className="btn-delete" color="secondary" onClick={()=> delAllAccount() } >del all account</Button>
-            <Title>Review Accounts</Title>
-            
-            <Table size="small"> 
-            <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Address</TableCell>
-                  <TableCell>Balance</TableCell>
-                  <TableCell>Hreoes</TableCell>
-                  <TableCell >OnSell</TableCell>
-                </TableRow>
-            </TableHead>
-
-            <TableBody>
-                {rows.map((row, index) => {
-                  return ( <TableRow >
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.addr.slice(0,4) + '***' +row.addr.slice(-4) }</TableCell>
-                    <TableCell>{row.balance}</TableCell>
-                    <TableCell>{row.hero}</TableCell>
-                    <TableCell>{row.onSell}</TableCell>
-                    <Button variant="contained" size="small" className="btn-info" color="primary" >more</Button>
-                    <Button  variant="contained" size="small" className="btn-delete" color="secondary" onClick={()=> delAccount(index) }>del</Button>
-                  </TableRow>) })}
-              </TableBody> 
-            </Table>
-
-            <div className={classes.seeMore}>
-              <Link color="primary" href="#" onClick={preventDefault}>
-                See more Accounts
-              </Link>
-            </div>
-          </Paper>
         </Grid>
       </Grid>
     </React.Fragment>
   );
 }
+
+
